@@ -12,7 +12,6 @@
 #include "reading.h"
 
 #include <filterMvScale.h>
-#include <scaleMV.h>
 #include <constants.h>
 #include <datapointUtility.h>
 

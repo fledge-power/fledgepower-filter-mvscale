@@ -1,5 +1,5 @@
 *****************************************************
-Unit Test for IEC 104 north plugin
+Unit Test for Plugin Measured Value Scale
 *****************************************************
 
 Require Google Unit Test framework

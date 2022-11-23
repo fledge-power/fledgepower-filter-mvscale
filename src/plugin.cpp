@@ -155,8 +155,6 @@ PLUGIN_HANDLE plugin_init(ConfigCategory* config,
                                         outHandle,
                                         output);
 
-	Logger::getLogger()->error("init %s", config->itemsToJSON(true).c_str());
-
  	if (config->itemExists("exchanged_data")){
 		filterMvScale->setJsonConfig(config->getValue("exchanged_data"));
 	}
