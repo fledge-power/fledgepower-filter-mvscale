@@ -7,14 +7,12 @@ using namespace std;
 /**
  * Constructor
 */
-ScaleMV::ScaleMV() {
-}
+ScaleMV::ScaleMV() {}
 
 /**
  * Destructor
 */
-ScaleMV::~ScaleMV() {
-}
+ScaleMV::~ScaleMV() {}
 
 /**
  * Method for scaling the measured value
@@ -24,7 +22,7 @@ ScaleMV::~ScaleMV() {
  * @param resultScale : return of the scaling status
  * @return the calculated value
 */
-float ScaleMV::scaleMesuredValue(double valueMesured, DataExchangeDefinition defMv, ScaleResult & resultScale) {
+float ScaleMV::scaleMesuredValue(double valueMesured, DataExchangeDefinition defMv, ScaleResult& resultScale) {
 
     double value = 0;
     resultScale = ScaleResult::NO_ERROR;

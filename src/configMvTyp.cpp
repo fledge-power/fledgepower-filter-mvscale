@@ -1,7 +1,7 @@
 #include "rapidjson/document.h"
 
 #include <configMvTyp.h>
-#include <constants.h>
+#include <constantsMvScale.h>
 
 #include <logger.h>
 #include <cctype>
@@ -28,7 +28,7 @@ ConfigMvTyp::~ConfigMvTyp() {
 */
 void ConfigMvTyp::deleteExchangeDefinitions() {
     for (auto const& exchangeDefintions : m_exchangeDefinitions) {
-        DataExchangeDefinition* dp = exchangeDefintions.second;
+        DataExchangeDefinition *dp = exchangeDefintions.second;
         delete dp;
     }
 
@@ -41,7 +41,7 @@ void ConfigMvTyp::deleteExchangeDefinitions() {
  * 
  * @param exchangeConfig : configuration Exchanged_data as a string 
 */
-void ConfigMvTyp::importExchangedData(const string & exchangeConfig) {
+void ConfigMvTyp::importExchangedData(const string& exchangeConfig) {
     
     deleteExchangeDefinitions();
     Document document;
@@ -55,42 +55,42 @@ void ConfigMvTyp::importExchangedData(const string & exchangeConfig) {
     if (!document.IsObject())
         return;
 
-    if (!document.HasMember(Constants::JSON_EXCHANGED_DATA) || !document[Constants::JSON_EXCHANGED_DATA].IsObject()) {
+    if (!document.HasMember(ConstantsMvScale::JsonExchangedData) || !document[ConstantsMvScale::JsonExchangedData].IsObject()) {
         return;
     }
-    const Value& exchangeData = document[Constants::JSON_EXCHANGED_DATA];
+    const Value& exchangeData = document[ConstantsMvScale::JsonExchangedData];
 
-    if (!exchangeData.HasMember(Constants::JSON_DATAPOINTS) || !exchangeData[Constants::JSON_DATAPOINTS].IsArray()) {
+    if (!exchangeData.HasMember(ConstantsMvScale::JsonDatapoints) || !exchangeData[ConstantsMvScale::JsonDatapoints].IsArray()) {
         return;
     }
-    const Value& datapoints = exchangeData[Constants::JSON_DATAPOINTS];
+    const Value& datapoints = exchangeData[ConstantsMvScale::JsonDatapoints];
 
     for (const Value& datapoint : datapoints.GetArray()) {
         
         if (!datapoint.IsObject()) continue;
         
-        if (!datapoint.HasMember(Constants::JSON_PIVOT_TYPE) || !datapoint[Constants::JSON_PIVOT_TYPE].IsString()) {
+        if (!datapoint.HasMember(ConstantsMvScale::JsonPivotType) || !datapoint[ConstantsMvScale::JsonPivotType].IsString()) {
             continue;
         }
-        string type = datapoint[Constants::JSON_PIVOT_TYPE].GetString();
-        if (type != Constants::JSON_ATTR_MVTYP) {
+        string type = datapoint[ConstantsMvScale::JsonPivotType].GetString();
+        if (type != ConstantsMvScale::JsonAttrMvtyp) {
             continue;
         }
 
-        if (!datapoint.HasMember(Constants::JSON_PIVOT_ID) || !datapoint[Constants::JSON_PIVOT_ID].IsString()) {
+        if (!datapoint.HasMember(ConstantsMvScale::JsonPivotId) || !datapoint[ConstantsMvScale::JsonPivotId].IsString()) {
             continue;
         }
-        string pivot_id = datapoint[Constants::JSON_PIVOT_ID].GetString();
+        string pivot_id = datapoint[ConstantsMvScale::JsonPivotId].GetString();
 
-        if (!datapoint.HasMember(Constants::JSON_TFID) || !datapoint[Constants::JSON_TFID].IsString()) {
+        if (!datapoint.HasMember(ConstantsMvScale::JsonTfid) || !datapoint[ConstantsMvScale::JsonTfid].IsString()) {
             continue;
         }
-        string tfid = datapoint[Constants::JSON_TFID].GetString();
+        string tfid = datapoint[ConstantsMvScale::JsonTfid].GetString();
 
-        if (!datapoint.HasMember(Constants::JSON_PARAMS) || !datapoint[Constants::JSON_PARAMS].IsArray()) {
+        if (!datapoint.HasMember(ConstantsMvScale::JsonParams) || !datapoint[ConstantsMvScale::JsonParams].IsArray()) {
             continue;
         }
-        auto params = datapoint[Constants::JSON_PARAMS].GetArray();
+        auto params = datapoint[ConstantsMvScale::JsonParams].GetArray();
 
         float factorB = 0;
         float factorA = 0;
@@ -106,10 +106,10 @@ void ConfigMvTyp::importExchangedData(const string & exchangeConfig) {
             factorA = 1;
         }
 
-        if (!datapoint.HasMember(Constants::JSON_DEADBAND) || !datapoint[Constants::JSON_DEADBAND].IsArray()) {
+        if (!datapoint.HasMember(ConstantsMvScale::JsonDeadband) || !datapoint[ConstantsMvScale::JsonDeadband].IsArray()) {
             continue;
         }
-        auto deadband = datapoint[Constants::JSON_DEADBAND].GetArray();
+        auto deadband = datapoint[ConstantsMvScale::JsonDeadband].GetArray();
 
         float deadbandMax = 0;
         float deadbandMin = 0;
@@ -122,7 +122,7 @@ void ConfigMvTyp::importExchangedData(const string & exchangeConfig) {
             continue;
         }
 
-        DataExchangeDefinition* config = new DataExchangeDefinition;
+        DataExchangeDefinition *config = new DataExchangeDefinition;
         if (config) {
             config->deadbandMax = deadbandMax;
             config->deadbandMin = deadbandMin;
@@ -144,22 +144,25 @@ void ConfigMvTyp::importExchangedData(const string & exchangeConfig) {
  * @return Law in the form of an enum
 */
 ScaleType ConfigMvTyp::getTypeScale(string tfid) {
-    if (tfid == Constants::JSON_ATTR_LAW_NORMAL) {
+    if (tfid == ConstantsMvScale::JsonAttrLawNormal) {
         return ScaleType::NORMAL;
     }
-    else if (tfid == Constants::JSON_ATTR_LAW_SQUARE_ROOT) {
+    else if (tfid == ConstantsMvScale::JsonAttrLawSquareRoot) {
         return ScaleType::SQUARE_ROOT;
     }
-    else if (tfid == Constants::JSON_ATTR_LAW_QUADRATIC) {
+    else if (tfid == ConstantsMvScale::JsonAttrLawQuadratic) {
         return ScaleType::QUADRATIC;
     }
     return ScaleType::TRANSPARENT;
 }
 
 /**
+ * Get the configuration data by searching with its identifier
  * 
+ * @param id : identifier
+ * @return the confiugation of a value measured
 */
-DataExchangeDefinition * ConfigMvTyp::getDataExchangeWithID(std::string id) {
+DataExchangeDefinition *ConfigMvTyp::getDataExchangeWithID(std::string id) {
     if(m_exchangeDefinitions.find(id) != m_exchangeDefinitions.end()) {
         return m_exchangeDefinitions[id];
     }

@@ -34,12 +34,12 @@ public:
     ConfigMvTyp();
     ~ConfigMvTyp();
 
-    void importExchangedData(const std::string & exchangeConfig);
+    void importExchangedData(const std::string& exchangeConfig);
     void deleteExchangeDefinitions();
 
-    std::map<std::string, DataExchangeDefinition*> & getExchangeDefinition() { return m_exchangeDefinitions; };
+    std::map<std::string, DataExchangeDefinition*>& getExchangeDefinition() { return m_exchangeDefinitions; };
 
-    DataExchangeDefinition * getDataExchangeWithID(std::string);
+    DataExchangeDefinition *getDataExchangeWithID(std::string);
 
 private:
     ScaleType getTypeScale(std::string tfid);

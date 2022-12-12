@@ -220,7 +220,7 @@ static string configureTransparent = QUOTE({
 
 extern "C" {
 	PLUGIN_INFORMATION *plugin_info();
-	PLUGIN_HANDLE plugin_init(ConfigCategory* config,
+	PLUGIN_HANDLE plugin_init(ConfigCategory *config,
 			  OUTPUT_HANDLE *outHandle,
 			  OUTPUT_STREAM output);
 };
@@ -228,8 +228,8 @@ extern "C" {
 class PluginConfigure : public testing::Test
 {
 protected:
-    FilterMvScale * filter = nullptr;  // Object on which we call for tests
-    ReadingSet * resultReading;
+    FilterMvScale *filter = nullptr;  // Object on which we call for tests
+    ReadingSet *resultReading;
 
     // Setup is ran for every tests, so each variable are reinitialised
     void SetUp() override

@@ -12,7 +12,7 @@
 #include "reading.h"
 
 #include <filterMvScale.h>
-#include <constants.h>
+#include <constantsMvScale.h>
 #include <datapointUtility.h>
 
 
@@ -67,43 +67,53 @@ void FilterMvScale::ingest(READINGSET *readingSet)
     // Filter enable, process the readings 
     if (isEnabled()) {
         // Just get all the readings in the readingset
-        const std::vector<Reading*> & readings = readingSet->getAllReadings();
+        const std::vector<Reading*>& readings = readingSet->getAllReadings();
         for (auto reading = readings.cbegin(); reading != readings.cend(); reading++) {
-            
+
             // Get datapoints on readings
-            Datapoints & dataPoints = (*reading)->getReadingData();
+            Datapoints& dataPoints = (*reading)->getReadingData();
             string assetName = (*reading)->getAssetName();
 
-            Datapoints * dpPivotTM = findDictElement(&dataPoints, Constants::KEY_MESSAGE_PIVOT_JSON_ROOT);
+            string beforeLog = ConstantsMvScale::NamePlugin + " - " + assetName + " - ingest : ";
+
+            Logger::getLogger()->debug("%s ReceivData %s", beforeLog.c_str(), (*reading)->toJSON().c_str());
+
+            Datapoints *dpPivotTM = findDictElement(&dataPoints, ConstantsMvScale::KeyMessagePivotJsonRoot);
             if (dpPivotTM == nullptr) {
+                Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonRoot.c_str());
                 continue;
             }
 
-            Datapoints * dpGtim = findDictElement(dpPivotTM, Constants::KEY_MESSAGE_PIVOT_JSON_GT);
+            Datapoints *dpGtim = findDictElement(dpPivotTM, ConstantsMvScale::KeyMessagePivotJsonGt);
             if (dpGtim == nullptr) {
+                Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonGt.c_str());
                 continue;
             }
 
-            Datapoints * dpTyp = findDictElement(dpGtim, Constants::KEY_MESSAGE_PIVOT_JSON_CDC_MV);
+            Datapoints *dpTyp = findDictElement(dpGtim, ConstantsMvScale::KeyMessagePivotJsonCdcMv);
             if (dpTyp == nullptr) {
+                Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonCdcMv.c_str());
                 continue;
             }
 
-            Datapoints * dpMag = findDictElement(dpTyp, Constants::KEY_MESSAGE_PIVOT_JSON_MAG);
+            Datapoints *dpMag = findDictElement(dpTyp, ConstantsMvScale::KeyMessagePivotJsonMag);
             if (dpMag == nullptr) {
+                Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonMag.c_str());
                 continue;
             }
 
-            string id = findStringElement(dpGtim, Constants::KEY_MESSAGE_PIVOT_JSON_ID);
+            string id = findStringElement(dpGtim, ConstantsMvScale::KeyMessagePivotJsonId);
             if (id.compare("") == 0) {
+                Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonId.c_str());
                 continue;
             }
 
             double valueMv = 0;
-            DatapointValue * dpValueMesure = findValueElement(dpMag, Constants::KEY_MESSAGE_PIVOT_JSON_MAG_I);
+            DatapointValue *dpValueMesure = findValueElement(dpMag, ConstantsMvScale::KeyMessagePivotJsonMagI);
             if (dpValueMesure == nullptr) {
-                dpValueMesure = findValueElement(dpMag, Constants::KEY_MESSAGE_PIVOT_JSON_MAG_F);
+                dpValueMesure = findValueElement(dpMag, ConstantsMvScale::KeyMessagePivotJsonMagF);
                 if (dpValueMesure == nullptr) {
+                    Logger::getLogger()->debug("%s Missing %s attributes (f or i), it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonMag.c_str());
                     continue;
                 }
             }
@@ -115,16 +125,19 @@ void FilterMvScale::ingest(READINGSET *readingSet)
                 valueMv = dpValueMesure->toDouble();
             }
             else {
+                Logger::getLogger()->debug("%s bad type measure, it is ignored", beforeLog.c_str());
                 continue;
             }
 
-            DataExchangeDefinition * dfMv = m_config->getDataExchangeWithID(id);
+            DataExchangeDefinition *dfMv = m_config->getDataExchangeWithID(id);
             if (dfMv == nullptr) {
+                Logger::getLogger()->debug("%s id (%s) missing from the configuration, it is ignored", beforeLog.c_str(), id.c_str());
                 continue;
             }
 
-            Datapoints * dpQ = findDictElement(dpTyp, Constants::KEY_MESSAGE_PIVOT_JSON_Q);
+            Datapoints *dpQ = findDictElement(dpTyp, ConstantsMvScale::KeyMessagePivotJsonQ);
             if (dpQ == nullptr) {
+                Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonQ.c_str());
                 continue;
             }
 
@@ -134,26 +147,28 @@ void FilterMvScale::ingest(READINGSET *readingSet)
             // Check quality
             bool checkValidity = this->checkValidity(dpQ);
             if(checkValidity) {
+                Logger::getLogger()->debug("%s check validity success", beforeLog.c_str());                
                 valueMv = sc.scaleMesuredValue(valueMv, *dfMv, resultScale);
             }
             else {
+                Logger::getLogger()->debug("%s check validity failed", beforeLog.c_str());
                 valueMv = 0;
             }
 
             this->createDetailQuality(dpQ, resultScale, checkValidity);
 
             DatapointValue dv(valueMv);
-            Datapoint * dpmagF = new Datapoint(Constants::KEY_MESSAGE_PIVOT_JSON_MAG_F, dv);
+            Datapoint *dpmagF = new Datapoint(ConstantsMvScale::KeyMessagePivotJsonMagF, dv);
 
-            Datapoint * dpmag = createDictElement(dpTyp, Constants::KEY_MESSAGE_PIVOT_JSON_MAG);
-            DatapointValue * v = &(dpmag->getData());
+            Datapoint *dpmag = createDictElement(dpTyp, ConstantsMvScale::KeyMessagePivotJsonMag);
+            DatapointValue *v = &(dpmag->getData());
             v->getDpVec()->push_back(dpmagF);            
 
             if (dfMv->typeScale != ScaleType::TRANSPARENT && checkValidity) {
-                createStringElement(dpQ, Constants::KEY_MESSAGE_PIVOT_JSON_SOURCE, Constants::VALUE_JSON_SUBSTITUTED);
+                createStringElement(dpQ, ConstantsMvScale::KeyMessagePivotJsonSource, ConstantsMvScale::ValueSubstituted);
             }
 
-            Logger::getLogger()->debug("Value mesured %s, new value %f", id.c_str(), valueMv);
+            Logger::getLogger()->debug("%s Value mesured %s, new value %f", beforeLog.c_str(), id.c_str(), valueMv);
         }
     }
     (*m_func)(m_data, readingSet);    
@@ -189,33 +204,39 @@ void FilterMvScale::reconfigure(const std::string& newConfig) {
  * @param resultScale : Scaling result status
  * @param checkValidity : Result of the quality control
 */
-void FilterMvScale::createDetailQuality(Datapoints * dpQ, ScaleResult resultScale, bool checkValidity) {
+void FilterMvScale::createDetailQuality(Datapoints *dpQ, ScaleResult resultScale, bool checkValidity) {
 
+    string beforeLog = ConstantsMvScale::NamePlugin + " - createDetailQuality : ";
+    
     if (checkValidity) {
 
         if (resultScale != ScaleResult::NO_ERROR) {
-            Datapoints * dpDetailQuality = findDictElement(dpQ, Constants::KEY_MESSAGE_PIVOT_JSON_DETAIL_QUALITY);
+            Datapoints *dpDetailQuality = findDictElement(dpQ, ConstantsMvScale::KeyMessagePivotJsonDetailQuality);
             if (dpDetailQuality == nullptr) {
-                Datapoint * dp = createDictElement(dpQ, Constants::KEY_MESSAGE_PIVOT_JSON_DETAIL_QUALITY);
+                Datapoint *dp = createDictElement(dpQ, ConstantsMvScale::KeyMessagePivotJsonDetailQuality);
                 dpDetailQuality = dp->getData().getDpVec();
             }
         
             if (resultScale == ScaleResult::INACURATE_VALUE) {
-                createIntegerElement(dpDetailQuality, Constants::KEY_MESSAGE_PIVOT_JSON_INACCURATE, 1);
-                createStringElement(dpQ, Constants::KEY_MESSAGE_PIVOT_JSON_VALIDITY, Constants::VALUE_JSON_QUESTIONABLE);
+                Logger::getLogger()->debug("%s add inaccurate quality", beforeLog.c_str());
+                createIntegerElement(dpDetailQuality, ConstantsMvScale::KeyMessagePivotJsonInaccurate, 1);
+                createStringElement(dpQ, ConstantsMvScale::KeyMessagePivotJsonValidity, ConstantsMvScale::ValueQuestionable);
             }
             else if (resultScale == ScaleResult::OVERFLOW_VALUE) {
-                createIntegerElement(dpDetailQuality, Constants::KEY_MESSAGE_PIVOT_JSON_OVERFLOW, 1);
-                createStringElement(dpQ, Constants::KEY_MESSAGE_PIVOT_JSON_VALIDITY, Constants::VALUE_JSON_INVALID);
+                Logger::getLogger()->debug("%s add overflow quality", beforeLog.c_str());
+                createIntegerElement(dpDetailQuality, ConstantsMvScale::KeyMessagePivotJsonOverflow, 1);
+                createStringElement(dpQ, ConstantsMvScale::KeyMessagePivotJsonValidity, ConstantsMvScale::ValueInvalid);
             }
             else if (resultScale == ScaleResult::INCONSISTENT_VALUE) {
-                createIntegerElement(dpDetailQuality, Constants::KEY_MESSAGE_PIVOT_JSON_INCONSISTENT, 1);
-                createStringElement(dpQ, Constants::KEY_MESSAGE_PIVOT_JSON_VALIDITY, Constants::VALUE_JSON_QUESTIONABLE);
+                Logger::getLogger()->debug("%s add inconsistent quality", beforeLog.c_str());
+                createIntegerElement(dpDetailQuality, ConstantsMvScale::KeyMessagePivotJsonInconsistent, 1);
+                createStringElement(dpQ, ConstantsMvScale::KeyMessagePivotJsonValidity, ConstantsMvScale::ValueQuestionable);
             }
         }
     }
     else {
-        createStringElement(dpQ, Constants::KEY_MESSAGE_PIVOT_JSON_VALIDITY, "invalid");
+        Logger::getLogger()->debug("%s add invalid (check validity failed)", beforeLog.c_str());
+        createStringElement(dpQ, ConstantsMvScale::KeyMessagePivotJsonValidity, "invalid");
     }
 }
 
@@ -226,18 +247,18 @@ void FilterMvScale::createDetailQuality(Datapoints * dpQ, ScaleResult resultScal
  * @param dpQ : Vector of datapoint for dicionary Q
  * @return true if quality is good, or else false
 */
-bool FilterMvScale::checkValidity(Datapoints * dpQ) {
+bool FilterMvScale::checkValidity(Datapoints *dpQ) {
     
     bool validity = true;
     
-    string strValidity = findStringElement(dpQ, Constants::KEY_MESSAGE_PIVOT_JSON_VALIDITY);
+    string strValidity = findStringElement(dpQ, ConstantsMvScale::KeyMessagePivotJsonValidity);
     if (strValidity.compare("good") != 0) {
         validity = false;
     }
 
-    Datapoints * dpDetailQuality = findDictElement(dpQ, Constants::KEY_MESSAGE_PIVOT_JSON_DETAIL_QUALITY);
+    Datapoints *dpDetailQuality = findDictElement(dpQ, ConstantsMvScale::KeyMessagePivotJsonDetailQuality);
     if (dpDetailQuality != nullptr) {
-        for (Datapoint* dp : * dpDetailQuality) {
+        for (Datapoint *dp : *dpDetailQuality) {
             DatapointValue& data = dp->getData();
             const DatapointValue::dataTagType dType(data.getType());
             if (dType == DatapointValue::T_INTEGER) {

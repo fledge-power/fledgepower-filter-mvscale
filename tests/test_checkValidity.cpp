@@ -3,7 +3,7 @@
 
 #include <filterMvScale.h>
 #include <jsonToDatapoints.h>
-#include <constants.h>
+#include <constantsMvScale.h>
 
 using namespace std;
 using namespace DatapointUtility;
@@ -75,7 +75,7 @@ static string jsonMessageWithDetailQuality = QUOTE({
 extern "C" {
 	PLUGIN_INFORMATION *plugin_info();
 	void plugin_ingest(void *handle, READINGSET *readingSet);
-	PLUGIN_HANDLE plugin_init(ConfigCategory* config,
+	PLUGIN_HANDLE plugin_init(ConfigCategory *config,
 			  OUTPUT_HANDLE *outHandle,
 			  OUTPUT_STREAM output);
 	
@@ -87,8 +87,8 @@ extern "C" {
 class CheckValidity : public testing::Test
 {
 protected:
-    FilterMvScale * filter = nullptr;  // Object on which we call for tests
-    ReadingSet * resultReading;
+    FilterMvScale *filter = nullptr;  // Object on which we call for tests
+    ReadingSet *resultReading;
 
     // Setup is ran for every tests, so each variable are reinitialised
     void SetUp() override
@@ -114,9 +114,9 @@ protected:
         ASSERT_NE(filter, (void *)NULL);
 
         // Create Reading
-        Datapoints * p = parseJson(json);
+        Datapoints *p = parseJson(json);
 
-		Reading* reading = new Reading(nameReading, *p);
+		Reading *reading = new Reading(nameReading, *p);
         Readings *readings = new Readings;
         readings->push_back(reading);
 
@@ -139,33 +139,33 @@ protected:
         delete reading;
     }
 
-    void verifyDatapoint(Datapoints * dps) {
-        Datapoints * dpPivot = findDictElement(dps, Constants::KEY_MESSAGE_PIVOT_JSON_ROOT);
+    void verifyDatapoint(Datapoints *dps) {
+        Datapoints *dpPivot = findDictElement(dps, ConstantsMvScale::KeyMessagePivotJsonRoot);
         ASSERT_NE(dpPivot, nullptr);
 
-        Datapoints * dpGi = findDictElement(dpPivot, Constants::KEY_MESSAGE_PIVOT_JSON_GT);
+        Datapoints *dpGi = findDictElement(dpPivot, ConstantsMvScale::KeyMessagePivotJsonGt);
         ASSERT_NE(dpGi, nullptr);
 
-        Datapoints * mvTyp = findDictElement(dpGi, Constants::KEY_MESSAGE_PIVOT_JSON_CDC_MV);
+        Datapoints *mvTyp = findDictElement(dpGi, ConstantsMvScale::KeyMessagePivotJsonCdcMv);
         ASSERT_NE(mvTyp, nullptr);
 
-		Datapoints * mag = findDictElement(mvTyp, Constants::KEY_MESSAGE_PIVOT_JSON_MAG);
+		Datapoints *mag = findDictElement(mvTyp, ConstantsMvScale::KeyMessagePivotJsonMag);
         ASSERT_NE(mag, nullptr);
 
-		DatapointValue * vF = findValueElement(mag, Constants::KEY_MESSAGE_PIVOT_JSON_MAG_F);
+		DatapointValue *vF = findValueElement(mag, ConstantsMvScale::KeyMessagePivotJsonMagF);
 		ASSERT_NE(vF, nullptr);
 		ASSERT_FLOAT_EQ(vF->toDouble(), 0);
 
-		DatapointValue * vI = findValueElement(mag, Constants::KEY_MESSAGE_PIVOT_JSON_MAG_I);
+		DatapointValue *vI = findValueElement(mag, ConstantsMvScale::KeyMessagePivotJsonMagI);
 		ASSERT_EQ(vI, nullptr);
 
-		Datapoints * dpq = findDictElement(mvTyp, Constants::KEY_MESSAGE_PIVOT_JSON_Q);
+		Datapoints *dpq = findDictElement(mvTyp, ConstantsMvScale::KeyMessagePivotJsonQ);
         ASSERT_NE(dpq, nullptr);
 
-		string validity = findStringElement(dpq, Constants::KEY_MESSAGE_PIVOT_JSON_VALIDITY);
+		string validity = findStringElement(dpq, ConstantsMvScale::KeyMessagePivotJsonValidity);
         ASSERT_STREQ(validity.c_str(), "invalid");
 
-		string source = findStringElement(dpq, Constants::KEY_MESSAGE_PIVOT_JSON_SOURCE);
+		string source = findStringElement(dpq, ConstantsMvScale::KeyMessagePivotJsonSource);
         ASSERT_STREQ(source.c_str(), "process");
     }
 };

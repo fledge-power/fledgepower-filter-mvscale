@@ -28,7 +28,7 @@ public:
     ScaleMV();
     ~ScaleMV();
 
-    float scaleMesuredValue(double value, DataExchangeDefinition defMv, ScaleResult & resultScale);
+    float scaleMesuredValue(double value, DataExchangeDefinition defMv, ScaleResult& resultScale);
 };
 
 #endif  // INCLUDE_SCALE_MV_H_

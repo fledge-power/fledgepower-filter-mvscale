@@ -3,7 +3,7 @@
 
 #include <filterMvScale.h>
 #include <jsonToDatapoints.h>
-#include <constants.h>
+#include <constantsMvScale.h>
 
 using namespace std;
 using namespace DatapointUtility;
@@ -266,7 +266,7 @@ static string jsonMessageWihtoutQ = QUOTE({
 extern "C" {
 	PLUGIN_INFORMATION *plugin_info();
 	void plugin_ingest(void *handle, READINGSET *readingSet);
-	PLUGIN_HANDLE plugin_init(ConfigCategory* config,
+	PLUGIN_HANDLE plugin_init(ConfigCategory *config,
 			  OUTPUT_HANDLE *outHandle,
 			  OUTPUT_STREAM output);
 	
@@ -278,8 +278,8 @@ extern "C" {
 class NoModifyData : public testing::Test
 {
 protected:
-    FilterMvScale * filter = nullptr;  // Object on which we call for tests
-    ReadingSet * resultReading;
+    FilterMvScale *filter = nullptr;  // Object on which we call for tests
+    ReadingSet *resultReading;
 
     // Setup is ran for every tests, so each variable are reinitialised
     void SetUp() override
@@ -305,14 +305,14 @@ protected:
 		ASSERT_NE(filter, (void *)NULL);
 
         // Create Reading
-        Datapoints * p = parseJson(json);
+        Datapoints *p = parseJson(json);
 
 		Reading *reading = new Reading(nameReading, *p);
         Readings *readings = new Readings;
         readings->push_back(reading);
 
         // Create ReadingSet
-        ReadingSet * readingSet = new ReadingSet(readings);
+        ReadingSet *readingSet = new ReadingSet(readings);
 		
         plugin_ingest(filter, (READINGSET*)readingSet);
         Readings results = resultReading->getAllReadings();
@@ -341,12 +341,12 @@ protected:
 		ASSERT_NE(dpTyp, nullptr);
 		
 		if (json != jsonMessageWithoutMag && json != jsonMessageMagEmpty && json != jsonMessageMagStr) {
-			Datapoints *dpMag = findDictElement(dpTyp, Constants::KEY_MESSAGE_PIVOT_JSON_MAG);
+			Datapoints *dpMag = findDictElement(dpTyp, ConstantsMvScale::KeyMessagePivotJsonMag);
 			DatapointValue *valueMv = nullptr;
 			if (dpMag != nullptr) {
-				valueMv = findValueElement(dpMag, Constants::KEY_MESSAGE_PIVOT_JSON_MAG_I);
+				valueMv = findValueElement(dpMag, ConstantsMvScale::KeyMessagePivotJsonMagI);
 				if (valueMv == nullptr) {
-					valueMv = findValueElement(dpMag, Constants::KEY_MESSAGE_PIVOT_JSON_MAG_F);
+					valueMv = findValueElement(dpMag, ConstantsMvScale::KeyMessagePivotJsonMagF);
 				}
 			}
 			ASSERT_NE(valueMv, nullptr);
@@ -359,13 +359,13 @@ protected:
 			}
 		}
 
-		Datapoints *dpQ = findDictElement(dpTyp, Constants::KEY_MESSAGE_PIVOT_JSON_Q);
+		Datapoints *dpQ = findDictElement(dpTyp, ConstantsMvScale::KeyMessagePivotJsonQ);
 		if (json == jsonMessageWihtoutQ) {	
 			ASSERT_EQ(dpQ, nullptr);
 		}
 		else {
 			ASSERT_NE(dpQ, nullptr);
-			DatapointValue *vSource = findValueElement(dpQ, Constants::KEY_MESSAGE_PIVOT_JSON_SOURCE);
+			DatapointValue *vSource = findValueElement(dpQ, ConstantsMvScale::KeyMessagePivotJsonSource);
 			ASSERT_NE(vSource, nullptr);
 			ASSERT_STREQ(vSource->toStringValue().c_str(), "process"); 
 		}

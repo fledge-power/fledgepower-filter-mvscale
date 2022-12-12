@@ -35,15 +35,15 @@ public:
 
     void setJsonConfig(std::string jsonExchanged);
 
-    ConfigMvTyp * getConfig() { return m_config; }
+    ConfigMvTyp *getConfig() { return m_config; }
 
 private:
 
-    void createDetailQuality(DatapointUtility::Datapoints * dpTyp, ScaleResult resultScale, bool checkQuality);
-    bool checkValidity(DatapointUtility::Datapoints * dpQ);
+    void createDetailQuality(DatapointUtility::Datapoints *dpTyp, ScaleResult resultScale, bool checkQuality);
+    bool checkValidity(DatapointUtility::Datapoints *dpQ);
 
     std::mutex      m_configMutex;
-    ConfigMvTyp*    m_config;
+    ConfigMvTyp    *m_config;
 };
 
 #endif  // INCLUDE_FILTER_MV_SCALE_H_

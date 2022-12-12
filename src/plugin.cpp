@@ -10,8 +10,7 @@
  */
 #include <version.h>
 #include <filterMvScale.h>
-
-#define FILTER_NAME "mvscale"
+#include <constantsMvScale.h>
 
 static const char *default_config = QUOTE({
 		"plugin" : {
