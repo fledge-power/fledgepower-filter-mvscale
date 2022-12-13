@@ -2,8 +2,13 @@
 #include <gtest/gtest.h>
 
 #include <filterMvScale.h>
+#include <jsonToDatapoints.h>
 
 using namespace std;
+using namespace DatapointUtility;
+using namespace JsonToDatapoints;
+
+static string nameReading = "data_test";
 
 static string reconfigure = QUOTE({
     "enable": {
@@ -11,11 +16,45 @@ static string reconfigure = QUOTE({
     }
 });
 
+static string jsonMessagePivotMVNormal = QUOTE({
+	"PIVOTTM": {
+        "GTIM": {
+            "Cause": {
+                "stVal": 1
+            },
+            "Identifier": "M_2367_3_15_4",
+            "MvTyp": {
+                "mag": {
+                    "i": 2
+                },
+                 "q": {
+                    "Source": "process",
+                    "Validity": "good"
+                },
+                "t": {
+                    "SecondSinceEpoch": 1668759955
+                }
+            },            
+            "TmOrg": {
+                "stVal": "genuine"
+            },
+            "TmValidity": {
+                "stVal": "VALID"
+            }
+        }
+    }
+});
+
 extern "C" {
-	PLUGIN_INFORMATION *plugin_info();
+   	PLUGIN_INFORMATION *plugin_info();
+	void plugin_ingest(void *handle, READINGSET *readingSet);
 	PLUGIN_HANDLE plugin_init(ConfigCategory *config,
 			  OUTPUT_HANDLE *outHandle,
 			  OUTPUT_STREAM output);
+	
+	void HandlerReconfigure(void *handle, READINGSET *readings) {
+		*(READINGSET **)handle = readings;
+	}
 
     void plugin_reconfigure(PLUGIN_HANDLE *handle, const string& newConfig);
 };
@@ -36,7 +75,7 @@ protected:
 		config->setItemsValueFromDefault();
 		config->setValue("enable", "true");
 		
-		void *handle = plugin_init(config, &resultReading, nullptr);
+		void *handle = plugin_init(config, &resultReading, HandlerReconfigure);
 		filter = (FilterMvScale *) handle;
     }
 
@@ -51,4 +90,19 @@ TEST_F(PluginReconfigure, Reconfigure)
 {
 	plugin_reconfigure((PLUGIN_HANDLE*)filter, reconfigure);
     ASSERT_EQ(filter->isEnabled(), false);
+
+    // Create Reading
+   	Datapoints *p = parseJson(jsonMessagePivotMVNormal.c_str());
+	Reading *reading = new Reading(nameReading, *p);
+    Readings *readings = new Readings;
+    readings->push_back(reading);
+
+    // Create ReadingSet
+    ReadingSet *readingSet = new ReadingSet(readings);
+
+	plugin_ingest(filter, (READINGSET*)readingSet);
+	Readings results = resultReading->getAllReadings();
+	ASSERT_EQ(results.size(), 1);
+
+    delete reading;
 }

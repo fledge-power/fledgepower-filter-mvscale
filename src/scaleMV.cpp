@@ -5,16 +5,6 @@
 using namespace std;
 
 /**
- * Constructor
-*/
-ScaleMV::ScaleMV() {}
-
-/**
- * Destructor
-*/
-ScaleMV::~ScaleMV() {}
-
-/**
  * Method for scaling the measured value
  * 
  * @param valueMesured : mesured value
@@ -28,35 +18,34 @@ float ScaleMV::scaleMesuredValue(double valueMesured, DataExchangeDefinition def
     resultScale = ScaleResult::NO_ERROR;
 
     // Verify inacurate value (deadband)
-    if (valueMesured > defMv.deadbandMin && valueMesured < defMv.deadbandMax) {
+    if (valueMesured > defMv.getDeadBandMin() && valueMesured < defMv.getDeadBandMax()) {
         resultScale = ScaleResult::INACURATE_VALUE;
-        return valueMesured;
+        return (float)valueMesured;
     }
 
     // Scale of value mesured
-    switch (defMv.typeScale) {
-        case NORMAL:
-            value = defMv.factorA * valueMesured + defMv.factorB;
+    switch (defMv.getTypeScale()) {
+        case ScaleType::NORMAL:
+            value = defMv.getFactorA() * valueMesured + defMv.getFactorB();
             break; 
-        case SQUARE_ROOT:
+        case ScaleType::SQUARE_ROOT:
             if (valueMesured > 0) {
-                value = defMv.factorA * sqrt(valueMesured) + defMv.factorB;
+                value = defMv.getFactorA() * sqrt(valueMesured) + defMv.getFactorB();
             }
             else {
                 value = 0;
                 resultScale = ScaleResult::INCONSISTENT_VALUE;
             }
             break; 
-        case QUADRATIC:
-            if ((defMv.factorA * valueMesured + defMv.factorB) > 0) {
-                value = sqrt(defMv.factorA * valueMesured + defMv.factorB);
+        case ScaleType::QUADRATIC:
+            if ((defMv.getFactorA() * valueMesured + defMv.getFactorB()) > 0) {
+                value = sqrt(defMv.getFactorA() * valueMesured + defMv.getFactorB());
             }
             else {
                 value = 0;
                 resultScale = ScaleResult::INCONSISTENT_VALUE;
             }
             break; 
-        case TRANSPARENT:
         default:
             value = valueMesured;
             break;

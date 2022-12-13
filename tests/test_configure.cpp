@@ -255,111 +255,113 @@ protected:
 TEST_F(PluginConfigure, ConfigureErrorParsingJSON) 
 {
 	filter->setJsonConfig(reconfigureErrorParseJSON);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition().size(), 0);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition().size(), 0);
 }
 
 TEST_F(PluginConfigure, ConfigureErrorExchanged_data) 
 {
 	filter->setJsonConfig(configureErrorExchanged_data);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition().size(), 0);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition().size(), 0);
 }
 
 TEST_F(PluginConfigure, ConfigureErrorDatapoint) 
 {
 	filter->setJsonConfig(configureErrorDatapoint);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition().size(), 0);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition().size(), 0);
 }
 
 TEST_F(PluginConfigure, ConfigureErrorType) 
 {
 	filter->setJsonConfig(configureErrorType);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition().size(), 0);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition().size(), 0);
 }
 
 TEST_F(PluginConfigure, ConfigureErrorTypeSps) 
 {
 	filter->setJsonConfig(configureErrorTypeSps);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition().size(), 0);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition().size(), 0);
 }
 
 TEST_F(PluginConfigure, ConfigureErrorPivotID) 
 {
 	filter->setJsonConfig(configureErrorPivotID);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition().size(), 0);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition().size(), 0);
 }
 
 TEST_F(PluginConfigure, ConfigureErrorTFID) 
 {
 	filter->setJsonConfig(configureErrorTFID);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition().size(), 0);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition().size(), 0);
 }
 
 TEST_F(PluginConfigure, ConfigureErrorFactors) 
 {
 	filter->setJsonConfig(configureErrorFactors);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition().size(), 0);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition().size(), 0);
 }
 
 TEST_F(PluginConfigure, ConfigureErrorDeadband) 
 {
 	filter->setJsonConfig(configureErrorDeadband);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition().size(), 0);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition().size(), 0);
 }
 
 TEST_F(PluginConfigure, ConfigureErrorParams) 
 {
 	filter->setJsonConfig(configureErrorParams);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition().size(), 0);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition().size(), 0);
 }
 
 TEST_F(PluginConfigure, ConfigureFactorA0) 
 {
 	filter->setJsonConfig(configureFactorA0);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition().size(), 1);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->factorA, 1);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition().size(), 1);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getFactorA(), 1);
 }
 
 TEST_F(PluginConfigure, ConfigureOK) 
 {
 	filter->setJsonConfig(configureOK);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition().size(), 1);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getDataExchangeWithID("M_2367_3_15_4")->factorA, 2.4);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getDataExchangeWithID("M_2367_3_15_4")->factorB, 3.6);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getDataExchangeWithID("M_2367_3_15_4")->deadbandMin, 4.2);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getDataExchangeWithID("M_2367_3_15_4")->deadbandMax, 5.5);
-    ASSERT_EQ(filter->getConfig()->getDataExchangeWithID("M_2367_3_15_4")->typeScale, ScaleType::NORMAL);
-}
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition().size(), 1);
 
+    DataExchangeDefinition d = filter->getConfigPlugin().getDataExchangeWithID("M_2367_3_15_4");
+
+    ASSERT_FLOAT_EQ(d.getFactorA(), 2.4);
+    ASSERT_FLOAT_EQ(d.getFactorB(), 3.6);
+    ASSERT_FLOAT_EQ(d.getDeadBandMin(), 4.2);
+    ASSERT_FLOAT_EQ(d.getDeadBandMax(), 5.5);
+    ASSERT_EQ(d.getTypeScale(), ScaleType::NORMAL);
+}
 
 TEST_F(PluginConfigure, ConfigureSquareRoot) 
 {
 	filter->setJsonConfig(configureSquareRoot);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition().size(), 1);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->factorA, 2.4);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->factorB, 3.6);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->deadbandMin, 4.2);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->deadbandMax, 5.5);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->typeScale, ScaleType::SQUARE_ROOT);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition().size(), 1);
+    ASSERT_FLOAT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getFactorA(), 2.4);
+    ASSERT_FLOAT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getFactorB(), 3.6);
+    ASSERT_FLOAT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getDeadBandMin(), 4.2);
+    ASSERT_FLOAT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getDeadBandMax(), 5.5);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getTypeScale(), ScaleType::SQUARE_ROOT);
 }
 
 TEST_F(PluginConfigure, ConfigureQuadra) 
 {
 	filter->setJsonConfig(configureQuadra);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition().size(), 1);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->factorA, 2.4);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->factorB, 3.6);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->deadbandMin, 4.2);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->deadbandMax, 5.5);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->typeScale, ScaleType::QUADRATIC);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition().size(), 1);
+    ASSERT_FLOAT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getFactorA(), 2.4);
+    ASSERT_FLOAT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getFactorB(), 3.6);
+    ASSERT_FLOAT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getDeadBandMin(), 4.2);
+    ASSERT_FLOAT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getDeadBandMax(), 5.5);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getTypeScale(), ScaleType::QUADRATIC);
 }
 
 TEST_F(PluginConfigure, ConfigureTransparent) 
 {
 	filter->setJsonConfig(configureTransparent);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition().size(), 1);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->factorA, 2.4);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->factorB, 3.6);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->deadbandMin, 4.2);
-    ASSERT_FLOAT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->deadbandMax, 5.5);
-    ASSERT_EQ(filter->getConfig()->getExchangeDefinition()["M_2367_3_15_4"]->typeScale, ScaleType::TRANSPARENT);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition().size(), 1);
+    ASSERT_FLOAT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getFactorA(), 2.4);
+    ASSERT_FLOAT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getFactorB(), 3.6);
+    ASSERT_FLOAT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getDeadBandMin(), 4.2);
+    ASSERT_FLOAT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getDeadBandMax(), 5.5);
+    ASSERT_EQ(filter->getConfigPlugin().getExchangeDefinition()["M_2367_3_15_4"].getTypeScale(), ScaleType::TRANSPARENT);
 }

@@ -16,18 +16,17 @@
 #include <map>
 #include <string>
 
-typedef enum {
+enum class ScaleResult {
     NO_ERROR,
     INCONSISTENT_VALUE,
     OVERFLOW_VALUE,
     INACURATE_VALUE
-} ScaleResult;
+};
 
 class ScaleMV {
 public:  
-    ScaleMV();
-    ~ScaleMV();
-
+    ScaleMV() = default;
+    
     float scaleMesuredValue(double value, DataExchangeDefinition defMv, ScaleResult& resultScale);
 };
 

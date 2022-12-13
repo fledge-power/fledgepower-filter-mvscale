@@ -13,26 +13,6 @@ using namespace rapidjson;
  * Constructor
 */
 ConfigMvTyp::ConfigMvTyp() {
-    m_exchangeDefinitions.clear();
-}
-
-/**
- * Destructor
-*/
-ConfigMvTyp::~ConfigMvTyp() {
-    deleteExchangeDefinitions();
-}
-
-/**
- * Deletion of loaded data
-*/
-void ConfigMvTyp::deleteExchangeDefinitions() {
-    for (auto const& exchangeDefintions : m_exchangeDefinitions) {
-        DataExchangeDefinition *dp = exchangeDefintions.second;
-        delete dp;
-    }
-
-    m_exchangeDefinitions.clear();
 }
 
 /**
@@ -43,10 +23,10 @@ void ConfigMvTyp::deleteExchangeDefinitions() {
 */
 void ConfigMvTyp::importExchangedData(const string& exchangeConfig) {
     
-    deleteExchangeDefinitions();
+    m_exchangeDefinitions.clear();
     Document document;
 
-    if (document.Parse(const_cast<char*>(exchangeConfig.c_str())).HasParseError()) {
+    if (document.Parse(exchangeConfig.c_str()).HasParseError()) {
         Logger::getLogger()->fatal("Parsing error in data exchange configuration");
         printf("Parsing error in data exchange configuration\n");
         return;
@@ -122,18 +102,16 @@ void ConfigMvTyp::importExchangedData(const string& exchangeConfig) {
             continue;
         }
 
-        DataExchangeDefinition *config = new DataExchangeDefinition;
-        if (config) {
-            config->deadbandMax = deadbandMax;
-            config->deadbandMin = deadbandMin;
-            config->factorA = factorA;
-            config->factorB = factorB;
-            config->typeScale = this->getTypeScale(tfid);
-            m_exchangeDefinitions[pivot_id] = config;
+        DataExchangeDefinition config;
+        config.setDeadBandMax(deadbandMax);
+        config.setDeadBandMin(deadbandMin);
+        config.setFactorA(factorA);
+        config.setFactorB(factorB);
+        config.setTypeScale(this->getTypeScale(tfid));
+        m_exchangeDefinitions[pivot_id] = config;
 
-            Logger::getLogger()->debug("Reconfiguration of %s, factorA[%f], factorB[%f], deadbandMin[%f], deadbandMax[%f], typeScale[%d/%s]",
-                pivot_id.c_str(), config->factorA, config->factorB, config->deadbandMin, config->deadbandMax, config->typeScale, tfid.c_str());
-        }   
+        Logger::getLogger()->debug("Reconfiguration of %s, factorA[%f], factorB[%f], deadbandMin[%f], deadbandMax[%f], typeScale[%d/%s]",
+            pivot_id.c_str(), config.getFactorA(), config.getFactorB(), config.getDeadBandMin(), config.getDeadBandMax(), config.getTypeScale(), tfid.c_str());
     }
 }
 
@@ -143,7 +121,7 @@ void ConfigMvTyp::importExchangedData(const string& exchangeConfig) {
  * @param tfid : law in the form of a string
  * @return Law in the form of an enum
 */
-ScaleType ConfigMvTyp::getTypeScale(string tfid) {
+ScaleType ConfigMvTyp::getTypeScale(const string& tfid) {
     if (tfid == ConstantsMvScale::JsonAttrLawNormal) {
         return ScaleType::NORMAL;
     }
@@ -162,9 +140,10 @@ ScaleType ConfigMvTyp::getTypeScale(string tfid) {
  * @param id : identifier
  * @return the confiugation of a value measured
 */
-DataExchangeDefinition *ConfigMvTyp::getDataExchangeWithID(std::string id) {
+DataExchangeDefinition ConfigMvTyp::getDataExchangeWithID(const std::string& id) {
+
     if(m_exchangeDefinitions.find(id) != m_exchangeDefinitions.end()) {
         return m_exchangeDefinitions[id];
     }
-    return nullptr;
+    return DataExchangeDefinition();
 }

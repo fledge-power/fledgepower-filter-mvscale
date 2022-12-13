@@ -28,14 +28,12 @@ public:
                         OUTPUT_HANDLE *outHandle,
                         OUTPUT_STREAM output);
 
-    ~FilterMvScale();
-
     void ingest(READINGSET *readingSet);
     void reconfigure(const std::string& newConfig);
 
-    void setJsonConfig(std::string jsonExchanged);
+    void setJsonConfig(const std::string& jsonExchanged);
 
-    ConfigMvTyp *getConfig() { return m_config; }
+    ConfigMvTyp getConfigPlugin() { return m_configPlugin; }
 
 private:
 
@@ -43,7 +41,7 @@ private:
     bool checkValidity(DatapointUtility::Datapoints *dpQ);
 
     std::mutex      m_configMutex;
-    ConfigMvTyp    *m_config;
+    ConfigMvTyp     m_configPlugin;
 };
 
 #endif  // INCLUDE_FILTER_MV_SCALE_H_

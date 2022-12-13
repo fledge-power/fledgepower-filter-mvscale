@@ -26,7 +26,7 @@ namespace DatapointUtility {
     DatapointValue *findValueElement        (Datapoints *dict, const std::string& key);
     Datapoint      *findDatapointElement    (Datapoints *dict, const std::string & key);
     std::string     findStringElement       (Datapoints *dict, const std::string& key);
-    
+
     // delete
     void deleteValue(Datapoints *dps, const std::string& key);
 

@@ -119,17 +119,15 @@ static PLUGIN_INFORMATION info = {
 		default_config	          // Default plugin configuration
 };
 
-typedef struct
-{
+struct FILTER_INFO {
 	FledgeFilter *handle;
 	std::string	configCatName;
-} FILTER_INFO;
+};
 
 /**
  * Return the information about this plugin
  */
-PLUGIN_INFORMATION *plugin_info()
-{
+PLUGIN_INFORMATION *plugin_info() {
 	return &info;
 }
 
@@ -149,7 +147,7 @@ PLUGIN_HANDLE plugin_init(ConfigCategory* config,
 			  OUTPUT_HANDLE *outHandle,
 			  OUTPUT_STREAM output)
 {
-	FilterMvScale *filterMvScale = new FilterMvScale(FILTER_NAME,
+	auto filterMvScale = new FilterMvScale(FILTER_NAME,
                                         *config,
                                         outHandle,
                                         output);
@@ -170,7 +168,7 @@ PLUGIN_HANDLE plugin_init(ConfigCategory* config,
 void plugin_ingest(PLUGIN_HANDLE *handle,
 		   READINGSET *readingSet)
 {
-	FilterMvScale *filterMvScale = (FilterMvScale *) handle;
+	auto filterMvScale = (FilterMvScale *) handle;
 	filterMvScale->ingest(readingSet);
 }
 
@@ -182,7 +180,7 @@ void plugin_ingest(PLUGIN_HANDLE *handle,
  */
 void plugin_reconfigure(PLUGIN_HANDLE *handle, const string& newConfig)
 {
-	FilterMvScale *filterMvScale = (FilterMvScale *)handle;
+	auto filterMvScale = (FilterMvScale *)handle;
 	filterMvScale->reconfigure(newConfig);
 }
 
@@ -191,7 +189,7 @@ void plugin_reconfigure(PLUGIN_HANDLE *handle, const string& newConfig)
  */
 void plugin_shutdown(PLUGIN_HANDLE *handle)
 {
-	FilterMvScale *filterMvScale = (FilterMvScale *)handle;
+	auto filterMvScale = (FilterMvScale *)handle;
 	delete filterMvScale;
 }
 

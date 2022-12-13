@@ -13,37 +13,20 @@
  */
 #include <map>
 #include <string>
-
-typedef enum {
-        NORMAL,
-        SQUARE_ROOT,
-        QUADRATIC,
-        TRANSPARENT
-    } ScaleType;
-
-typedef struct {
-    float factorA;
-    float factorB;
-    float deadbandMin;
-    float deadbandMax;
-    ScaleType typeScale;
-} DataExchangeDefinition;
+#include <dataExchangeDefinition.h>
 
 class ConfigMvTyp {
 public:  
     ConfigMvTyp();
-    ~ConfigMvTyp();
 
     void importExchangedData(const std::string& exchangeConfig);
-    void deleteExchangeDefinitions();
-
-    std::map<std::string, DataExchangeDefinition*>& getExchangeDefinition() { return m_exchangeDefinitions; };
-
-    DataExchangeDefinition *getDataExchangeWithID(std::string);
+    DataExchangeDefinition getDataExchangeWithID(const std::string& id);
+    
+    std::map<std::string, DataExchangeDefinition>& getExchangeDefinition() { return m_exchangeDefinitions; };
 
 private:
-    ScaleType getTypeScale(std::string tfid);
-    std::map<std::string, DataExchangeDefinition*> m_exchangeDefinitions = std::map<std::string, DataExchangeDefinition*>();
+    ScaleType getTypeScale(const std::string& tfid);
+    std::map<std::string, DataExchangeDefinition> m_exchangeDefinitions;
 };
 
 #endif  // INCLUDE_CONFIG_MV_TYP_H_

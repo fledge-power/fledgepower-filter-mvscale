@@ -15,7 +15,6 @@
 #include <constantsMvScale.h>
 #include <datapointUtility.h>
 
-
 using namespace std;
 using namespace DatapointUtility;
 
@@ -36,14 +35,6 @@ FilterMvScale::FilterMvScale(const std::string& filterName,
                         OUTPUT_STREAM output) :
                                 FledgeFilter(filterName, filterConfig, outHandle, output)
 {
-    m_config = new ConfigMvTyp();
-}
-
-/**
- * Destructor for this filter class
- */
-FilterMvScale::~FilterMvScale() {
-    delete m_config;
 }
 
 /**
@@ -51,8 +42,8 @@ FilterMvScale::~FilterMvScale() {
  * 
  * @param jsonExchanged : configuration ExchangedData
 */
-void FilterMvScale::setJsonConfig(string jsonExchanged) {
-    m_config->importExchangedData(jsonExchanged);
+void FilterMvScale::setJsonConfig(const string& jsonExchanged) {
+    m_configPlugin.importExchangedData(jsonExchanged);
 }
 
 /**
@@ -65,112 +56,116 @@ void FilterMvScale::ingest(READINGSET *readingSet)
     lock_guard<mutex> guard(m_configMutex);
 	
     // Filter enable, process the readings 
-    if (isEnabled()) {
-        // Just get all the readings in the readingset
-        const std::vector<Reading*>& readings = readingSet->getAllReadings();
-        for (auto reading = readings.cbegin(); reading != readings.cend(); reading++) {
-
-            // Get datapoints on readings
-            Datapoints& dataPoints = (*reading)->getReadingData();
-            string assetName = (*reading)->getAssetName();
-
-            string beforeLog = ConstantsMvScale::NamePlugin + " - " + assetName + " - ingest : ";
-
-            Logger::getLogger()->debug("%s ReceivData %s", beforeLog.c_str(), (*reading)->toJSON().c_str());
-
-            Datapoints *dpPivotTM = findDictElement(&dataPoints, ConstantsMvScale::KeyMessagePivotJsonRoot);
-            if (dpPivotTM == nullptr) {
-                Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonRoot.c_str());
-                continue;
-            }
-
-            Datapoints *dpGtim = findDictElement(dpPivotTM, ConstantsMvScale::KeyMessagePivotJsonGt);
-            if (dpGtim == nullptr) {
-                Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonGt.c_str());
-                continue;
-            }
-
-            Datapoints *dpTyp = findDictElement(dpGtim, ConstantsMvScale::KeyMessagePivotJsonCdcMv);
-            if (dpTyp == nullptr) {
-                Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonCdcMv.c_str());
-                continue;
-            }
-
-            Datapoints *dpMag = findDictElement(dpTyp, ConstantsMvScale::KeyMessagePivotJsonMag);
-            if (dpMag == nullptr) {
-                Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonMag.c_str());
-                continue;
-            }
-
-            string id = findStringElement(dpGtim, ConstantsMvScale::KeyMessagePivotJsonId);
-            if (id.compare("") == 0) {
-                Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonId.c_str());
-                continue;
-            }
-
-            double valueMv = 0;
-            DatapointValue *dpValueMesure = findValueElement(dpMag, ConstantsMvScale::KeyMessagePivotJsonMagI);
-            if (dpValueMesure == nullptr) {
-                dpValueMesure = findValueElement(dpMag, ConstantsMvScale::KeyMessagePivotJsonMagF);
-                if (dpValueMesure == nullptr) {
-                    Logger::getLogger()->debug("%s Missing %s attributes (f or i), it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonMag.c_str());
-                    continue;
-                }
-            }
-
-            if (dpValueMesure->getType() == DatapointValue::T_INTEGER) {
-                valueMv = dpValueMesure->toInt();
-            }
-            else if (dpValueMesure->getType() == DatapointValue::T_FLOAT) {
-                valueMv = dpValueMesure->toDouble();
-            }
-            else {
-                Logger::getLogger()->debug("%s bad type measure, it is ignored", beforeLog.c_str());
-                continue;
-            }
-
-            DataExchangeDefinition *dfMv = m_config->getDataExchangeWithID(id);
-            if (dfMv == nullptr) {
-                Logger::getLogger()->debug("%s id (%s) missing from the configuration, it is ignored", beforeLog.c_str(), id.c_str());
-                continue;
-            }
-
-            Datapoints *dpQ = findDictElement(dpTyp, ConstantsMvScale::KeyMessagePivotJsonQ);
-            if (dpQ == nullptr) {
-                Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonQ.c_str());
-                continue;
-            }
-
-            ScaleResult resultScale;
-            ScaleMV sc;           
-            
-            // Check quality
-            bool checkValidity = this->checkValidity(dpQ);
-            if(checkValidity) {
-                Logger::getLogger()->debug("%s check validity success", beforeLog.c_str());                
-                valueMv = sc.scaleMesuredValue(valueMv, *dfMv, resultScale);
-            }
-            else {
-                Logger::getLogger()->debug("%s check validity failed", beforeLog.c_str());
-                valueMv = 0;
-            }
-
-            this->createDetailQuality(dpQ, resultScale, checkValidity);
-
-            DatapointValue dv(valueMv);
-            Datapoint *dpmagF = new Datapoint(ConstantsMvScale::KeyMessagePivotJsonMagF, dv);
-
-            Datapoint *dpmag = createDictElement(dpTyp, ConstantsMvScale::KeyMessagePivotJsonMag);
-            DatapointValue *v = &(dpmag->getData());
-            v->getDpVec()->push_back(dpmagF);            
-
-            if (dfMv->typeScale != ScaleType::TRANSPARENT && checkValidity) {
-                createStringElement(dpQ, ConstantsMvScale::KeyMessagePivotJsonSource, ConstantsMvScale::ValueSubstituted);
-            }
-
-            Logger::getLogger()->debug("%s Value mesured %s, new value %f", beforeLog.c_str(), id.c_str(), valueMv);
-        }
+    if (!isEnabled()) {
+        (*m_func)(m_data, readingSet);    
+        return;
     }
+
+    // Just get all the readings in the readingset
+    const std::vector<Reading*>& readings = readingSet->getAllReadings();
+    for (auto reading = readings.cbegin(); reading != readings.cend(); reading++) {
+
+        // Get datapoints on readings
+        Datapoints& dataPoints = (*reading)->getReadingData();
+        string assetName = (*reading)->getAssetName();
+
+        string beforeLog = ConstantsMvScale::NamePlugin + " - " + assetName + " - ingest : ";
+
+        Logger::getLogger()->debug("%s ReceivData %s", beforeLog.c_str(), (*reading)->toJSON().c_str());
+
+        Datapoints *dpPivotTM = findDictElement(&dataPoints, ConstantsMvScale::KeyMessagePivotJsonRoot);
+        if (dpPivotTM == nullptr) {
+            Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonRoot.c_str());
+            continue;
+        }
+
+        Datapoints *dpGtim = findDictElement(dpPivotTM, ConstantsMvScale::KeyMessagePivotJsonGt);
+        if (dpGtim == nullptr) {
+            Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonGt.c_str());
+            continue;
+        }
+
+        Datapoints *dpTyp = findDictElement(dpGtim, ConstantsMvScale::KeyMessagePivotJsonCdcMv);
+        if (dpTyp == nullptr) {
+            Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonCdcMv.c_str());
+            continue;
+        }
+
+        Datapoints *dpMag = findDictElement(dpTyp, ConstantsMvScale::KeyMessagePivotJsonMag);
+        if (dpMag == nullptr) {
+            Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonMag.c_str());
+            continue;
+        }
+
+        string id = findStringElement(dpGtim, ConstantsMvScale::KeyMessagePivotJsonId);
+        if (id.compare("") == 0) {
+            Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonId.c_str());
+            continue;
+        }
+
+        double valueMv = 0;
+        DatapointValue *dpValueMesure = findValueElement(dpMag, ConstantsMvScale::KeyMessagePivotJsonMagI);
+        if (dpValueMesure == nullptr) {
+            dpValueMesure = findValueElement(dpMag, ConstantsMvScale::KeyMessagePivotJsonMagF);
+            if (dpValueMesure == nullptr) {
+                Logger::getLogger()->debug("%s Missing %s attributes (f or i), it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonMag.c_str());
+                continue;
+            }
+        }
+
+        if (dpValueMesure->getType() == DatapointValue::T_INTEGER) {
+            valueMv = (double)dpValueMesure->toInt();
+        }
+        else if (dpValueMesure->getType() == DatapointValue::T_FLOAT) {
+            valueMv = dpValueMesure->toDouble();
+        }
+        else {
+            Logger::getLogger()->debug("%s bad type measure, it is ignored", beforeLog.c_str());
+            continue;
+        }
+
+        DataExchangeDefinition dfMv = m_configPlugin.getDataExchangeWithID(id);
+        if (dfMv == DataExchangeDefinition()) {
+            Logger::getLogger()->debug("%s id (%s) missing from the configuration, it is ignored", beforeLog.c_str(), id.c_str());
+            continue;
+        }
+
+        Datapoints *dpQ = findDictElement(dpTyp, ConstantsMvScale::KeyMessagePivotJsonQ);
+        if (dpQ == nullptr) {
+            Logger::getLogger()->debug("%s Missing %s attribute, it is ignored", beforeLog.c_str(), ConstantsMvScale::KeyMessagePivotJsonQ.c_str());
+            continue;
+        }
+
+        ScaleResult resultScale;
+        ScaleMV sc;           
+        
+        // Check quality
+        bool checkValidity = this->checkValidity(dpQ);
+        if(checkValidity) {
+            Logger::getLogger()->debug("%s check validity success", beforeLog.c_str());                
+            valueMv = sc.scaleMesuredValue(valueMv, dfMv, resultScale);
+        }
+        else {
+            Logger::getLogger()->debug("%s check validity failed", beforeLog.c_str());
+            valueMv = 0;
+        }
+
+        this->createDetailQuality(dpQ, resultScale, checkValidity);
+
+        DatapointValue dv(valueMv);
+        auto dpmagF = new Datapoint(ConstantsMvScale::KeyMessagePivotJsonMagF, dv);
+
+        Datapoint *dpmag = createDictElement(dpTyp, ConstantsMvScale::KeyMessagePivotJsonMag);
+        DatapointValue *v = &(dpmag->getData());
+        v->getDpVec()->push_back(dpmagF);            
+
+        if (dfMv.getTypeScale() != ScaleType::TRANSPARENT && checkValidity) {
+            createStringElement(dpQ, ConstantsMvScale::KeyMessagePivotJsonSource, ConstantsMvScale::ValueSubstituted);
+        }
+
+        Logger::getLogger()->debug("%s Value mesured %s, new value %f", beforeLog.c_str(), id.c_str(), valueMv);
+    }
+
     (*m_func)(m_data, readingSet);    
 }
 
