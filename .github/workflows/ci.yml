@@ -12,7 +12,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       SONAR_SCANNER_VERSION: 4.6.1.2450 # Find the latest version in the "Windows" link on this page:
                                         # https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/
@@ -64,7 +64,7 @@ jobs:
           find $HOME/fledge/C/plugins/ -name '*.h' -exec sudo cp -prv '{}' '/usr/include/fledge/' ';'
           find $HOME/fledge/C/services/ -name '*.h' -exec sudo cp -prv '{}' '/usr/include/fledge/' ';'
           find $HOME/fledge/C/tasks/ -name '*.h' -exec sudo cp -prv '{}' '/usr/include/fledge/' ';'
-          find $HOME/fledge/C/thirdparty/Simple-Web-Server/ -name '*.hpp' -exec sudo cp -prv '{}' '/usr/local/fledge/include' ';'
+          find $HOME/fledge/C/thirdparty/Simple-Web-Server/ -name '*.hpp' -exec sudo cp -prv '{}' '/usr/include/fledge/' ';'
           sudo cp -prv $HOME/fledge/C/thirdparty/rapidjson/include/rapidjson/* /usr/include/fledge/rapidjson/
           sudo mkdir -p /usr/lib/fledge/
           sudo cp -prv /usr/local/fledge/lib/* /usr/lib/fledge/
@@ -93,4 +93,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          sonar-scanner --define sonar.host.url="${{ env.SONAR_SERVER_URL }}" --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}" --define sonar.organization="fledge-power" --define sonar.projectKey="fledgepower-filter-mvscale" --define sonar.inclusions="src/*,include/*" --define sonar.coverageReportPaths="build/mvscale_coverage_sonar-sonarqube.xml"
+          sonar-scanner --define sonar.host.url="${{ env.SONAR_SERVER_URL }}" --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}" --define sonar.organization="fledge-power" --define sonar.projectKey="fledge-power_fledgepower-filter-mvscale" --define sonar.inclusions="src/*,include/*" --define sonar.coverageReportPaths="build/mvscale_coverage_sonar-sonarqube.xml"
