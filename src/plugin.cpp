@@ -59,8 +59,8 @@ static const char *default_config = QUOTE({
 							"protocols":[
 								{
 									"name":"IEC104",
-									"typeid":"M_ME_NC_1",
-									"address":"3271612"
+									"typeid":"M_ME_NC_2",
+									"address":"3271644"
 								}
 							]
 						},
@@ -74,8 +74,8 @@ static const char *default_config = QUOTE({
 							"protocols":[
 								{
 									"name":"IEC104",
-									"typeid":"M_ME_NC_1",
-									"address":"3271612"
+									"typeid":"M_ME_ND_1",
+									"address":"3273333"
 								}
 							]
 						},
@@ -89,8 +89,8 @@ static const char *default_config = QUOTE({
 							"protocols":[
 								{
 									"name":"IEC104",
-									"typeid":"M_ME_NC_1",
-									"address":"3271612"
+									"typeid":"M_ME_NB_1",
+									"address":"3271444"
 								}
 							]
 						}    
