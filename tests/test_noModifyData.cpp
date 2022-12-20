@@ -41,7 +41,7 @@ static string jsonMessagePivotTS = QUOTE({
 });
 
 static string jsonMessageGiTs = QUOTE({
-	"PIVOTTM": {
+	"PIVOT": {
         "GTIS": {
             "Cause": {
                 "stVal": 1
@@ -70,7 +70,7 @@ static string jsonMessageGiTs = QUOTE({
 });
 
 static string jsonMessageDpsTyp = QUOTE({
-	"PIVOTTM": {
+	"PIVOT": {
         "GTIM": {
             "Cause": {
                 "stVal": 1
@@ -99,7 +99,7 @@ static string jsonMessageDpsTyp = QUOTE({
 });
 
 static string jsonMessageWithoutMag = QUOTE({
-	"PIVOTTM": {
+	"PIVOT": {
         "GTIM": {
             "Cause": {
                 "stVal": 1
@@ -125,7 +125,7 @@ static string jsonMessageWithoutMag = QUOTE({
 });
 
 static string jsonMessageWithoutID = QUOTE({
-	"PIVOTTM": {
+	"PIVOT": {
         "GTIM": {
             "Cause": {
                 "stVal": 1
@@ -153,7 +153,7 @@ static string jsonMessageWithoutID = QUOTE({
 });
 
 static string jsonMessageMagEmpty = QUOTE({
-	"PIVOTTM": {
+	"PIVOT": {
         "GTIM": {
             "Cause": {
                 "stVal": 1
@@ -181,7 +181,7 @@ static string jsonMessageMagEmpty = QUOTE({
 });
 
 static string jsonMessageMagStr = QUOTE({
-	"PIVOTTM": {
+	"PIVOT": {
         "GTIM": {
             "Cause": {
                 "stVal": 1
@@ -210,7 +210,7 @@ static string jsonMessageMagStr = QUOTE({
 });
 
 static string jsonMessageUnknownConfig = QUOTE({
-	"PIVOTTM": {
+	"PIVOT": {
         "GTIM": {
             "Cause": {
                 "stVal": 1
@@ -239,7 +239,7 @@ static string jsonMessageUnknownConfig = QUOTE({
 });
  
 static string jsonMessageWihtoutQ = QUOTE({
-	"PIVOTTM": {
+	"PIVOT": {
         "GTIM": {
             "Cause": {
                 "stVal": 1
@@ -379,40 +379,40 @@ TEST_F(NoModifyData, MessagePIVOTTS)
 
 TEST_F(NoModifyData, MessageGTIS) 
 {
-	startTests(jsonMessageGiTs, "PIVOTTM", "GTIS", "MvTyp");
+	startTests(jsonMessageGiTs, "PIVOT", "GTIS", "MvTyp");
 }
 
 TEST_F(NoModifyData, MessageDSPTYP) 
 {
-	startTests(jsonMessageDpsTyp, "PIVOTTM", "GTIM", "DpsTyp");
+	startTests(jsonMessageDpsTyp, "PIVOT", "GTIM", "DpsTyp");
 }
 
 TEST_F(NoModifyData, MessageWithoutMag) 
 {
-	startTests(jsonMessageWithoutMag, "PIVOTTM", "GTIM", "MvTyp");
+	startTests(jsonMessageWithoutMag, "PIVOT", "GTIM", "MvTyp");
 }
 
 TEST_F(NoModifyData, MessageWithoutID) 
 {
-	startTests(jsonMessageWithoutID, "PIVOTTM", "GTIM", "MvTyp");
+	startTests(jsonMessageWithoutID, "PIVOT", "GTIM", "MvTyp");
 }
 
 TEST_F(NoModifyData, MessageMagEmpty) 
 {
-	startTests(jsonMessageMagEmpty, "PIVOTTM", "GTIM", "MvTyp");
+	startTests(jsonMessageMagEmpty, "PIVOT", "GTIM", "MvTyp");
 }
 
 TEST_F(NoModifyData, MessageMagStr) 
 {
-	startTests(jsonMessageMagStr, "PIVOTTM", "GTIM", "MvTyp");
+	startTests(jsonMessageMagStr, "PIVOT", "GTIM", "MvTyp");
 }
 
 TEST_F(NoModifyData, MessageUnknownConfig) 
 {
-	startTests(jsonMessageUnknownConfig, "PIVOTTM", "GTIM", "MvTyp");
+	startTests(jsonMessageUnknownConfig, "PIVOT", "GTIM", "MvTyp");
 }
 
 TEST_F(NoModifyData, MessageWihtoutQ) 
 {
-	startTests(jsonMessageWihtoutQ, "PIVOTTM", "GTIM", "MvTyp");
+	startTests(jsonMessageWihtoutQ, "PIVOT", "GTIM", "MvTyp");
 }
