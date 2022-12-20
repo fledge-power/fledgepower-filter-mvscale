@@ -9,13 +9,13 @@ namespace ConstantsMvScale {
 
     static const std::string NamePlugin             = FILTER_NAME;
     
-    static const char *JsonExchangedData            = "exchanged_data";
-    static const char *JsonDatapoints               = "datapoints";
-    static const char *JsonPivotType                = "pivot_type";
-    static const char *JsonPivotId                  = "pivot_id";
-    static const char *JsonTfid                     = "tfid";
-    static const char *JsonDeadband                 = "deadband";
-    static const char *JsonParams                   = "params";
+    constexpr const char *JsonExchangedData            = "exchanged_data";
+    constexpr const char *JsonDatapoints               = "datapoints";
+    constexpr const char *JsonPivotType                = "pivot_type";
+    constexpr const char *JsonPivotId                  = "pivot_id";
+    constexpr const char *JsonTfid                     = "tfid";
+    constexpr const char *JsonDeadband                 = "deadband";
+    constexpr const char *JsonParams                   = "params";
 
     static const std::string JsonAttrMvtyp          = "MvTyp";
     static const std::string JsonAttrLawNormal      = "normal";
