@@ -86,7 +86,7 @@ static string configure = QUOTE({
 });
 
 static string jsonMessagePivotMVNormal = QUOTE({
-	"PIVOTTM": {
+	"PIVOT": {
         "GTIM": {
             "Cause": {
                 "stVal": 1
@@ -115,7 +115,7 @@ static string jsonMessagePivotMVNormal = QUOTE({
 });
 
 static string jsonMessagePivotMVSquareRoot = QUOTE({
-	"PIVOTTM": {
+	"PIVOT": {
         "GTIM": {
             "Cause": {
                 "stVal": 1
@@ -144,7 +144,7 @@ static string jsonMessagePivotMVSquareRoot = QUOTE({
 });
 
 static string jsonMessagePivotMVQuadra = QUOTE({
-	"PIVOTTM": {
+	"PIVOT": {
         "GTIM": {
             "Cause": {
                 "stVal": 1
@@ -173,7 +173,7 @@ static string jsonMessagePivotMVQuadra = QUOTE({
 });
 
 static string jsonMessagePivotMVTransparent = QUOTE({
-	"PIVOTTM": {
+	"PIVOT": {
         "GTIM": {
             "Cause": {
                 "stVal": 1

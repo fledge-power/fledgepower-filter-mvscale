@@ -17,7 +17,7 @@ static string reconfigure = QUOTE({
 });
 
 static string jsonMessagePivotMVNormal = QUOTE({
-	"PIVOTTM": {
+	"PIVOT": {
         "GTIM": {
             "Cause": {
                 "stVal": 1

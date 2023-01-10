@@ -12,7 +12,7 @@ using namespace JsonToDatapoints;
 static string nameReading = "data_test";
 
 static string jsonMessageValidityInvalid = QUOTE({
-	"PIVOTTM": {
+	"PIVOT": {
         "GTIM": {
             "Cause": {
                 "stVal": 1
@@ -41,7 +41,7 @@ static string jsonMessageValidityInvalid = QUOTE({
 });
 
 static string jsonMessageWithDetailQuality = QUOTE({
-	"PIVOTTM": {
+	"PIVOT": {
         "GTIM": {
             "Cause": {
                 "stVal": 1
