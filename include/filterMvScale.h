@@ -12,7 +12,7 @@
  * 
  */
 #include <configMvTyp.h>
-#include <datapointUtility.h>
+#include <datapoint_utility.h>
 #include <scaleMV.h>
 
 #include <config_category.h>

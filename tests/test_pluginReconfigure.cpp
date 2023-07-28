@@ -2,11 +2,9 @@
 #include <gtest/gtest.h>
 
 #include <filterMvScale.h>
-#include <jsonToDatapoints.h>
 
 using namespace std;
 using namespace DatapointUtility;
-using namespace JsonToDatapoints;
 
 static string nameReading = "data_test";
 
@@ -92,7 +90,12 @@ TEST_F(PluginReconfigure, Reconfigure)
     ASSERT_EQ(filter->isEnabled(), false);
 
     // Create Reading
-   	Datapoints *p = parseJson(jsonMessagePivotMVNormal.c_str());
+    DatapointValue d("");
+    Datapoint *tmp = new Datapoint("", d);
+    Datapoints *p = tmp->parseJson(jsonMessagePivotMVNormal.c_str());
+    delete tmp;
+
+
 	Reading *reading = new Reading(nameReading, *p);
     Readings *readings = new Readings;
     readings->push_back(reading);

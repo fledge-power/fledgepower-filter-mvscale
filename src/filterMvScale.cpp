@@ -13,7 +13,7 @@
 
 #include <filterMvScale.h>
 #include <constantsMvScale.h>
-#include <datapointUtility.h>
+#include <datapoint_utility.h>
 
 using namespace std;
 using namespace DatapointUtility;
