@@ -58,7 +58,7 @@ jobs:
           cd $HOME/fledge
           sudo apt-get update
           sudo apt-get install libcurl4-openssl-dev
-          echo "/!\ PATCH Fledge CMAKELIST min version for compat cmake v4 /!\"
+          echo '/!\ PATCH Fledge CMAKELIST min version for compat cmake v4 /!\'
           sudo sed -i 's/cmake_minimum_required (VERSION .*)/cmake_minimum_required (VERSION 3.10)/g' $HOME/fledge/CMakeLists.txt
           sudo $HOME/fledge/requirements.sh
           sudo make install
