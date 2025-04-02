@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6.0)
+cmake_minimum_required (VERSION 3.10)
 
 # Set the plugin name to build
 project(mvscale)
@@ -29,8 +29,8 @@ if (${CMAKE_BUILD_TYPE} STREQUAL Coverage)
                                       DEPENDENCIES RunTests
                                       BASE_DIRECTORY "${PROJECT_SOURCE_DIR}"
                                       EXCLUDE "tests/*"
-  )    
-  
+  )
+
   setup_target_for_coverage_gcovr_html(NAME "${PROJECT_NAME}_coverage_html"
                                        EXECUTABLE RunTests
                                        DEPENDENCIES RunTests
@@ -39,7 +39,7 @@ if (${CMAKE_BUILD_TYPE} STREQUAL Coverage)
   )
   message(STATUS "Using Fledge dev package includes2 " ${FLEDGE_INCLUDE})
 else()
-  message("Build without Coverage") 
+  message("Build without Coverage")
   set(CMAKE_CXX_FLAGS "-std=c++11 -O3")
 endif()
 
@@ -77,7 +77,7 @@ if (NOT FLEDGE_FOUND)
 	# Stop the build process
 	message(FATAL_ERROR "Fledge plugin '${PROJECT_NAME}' build error.")
 endif()
-# On success, FLEDGE_INCLUDE_DIRS and FLEDGE_LIB_DIRS variables are set 
+# On success, FLEDGE_INCLUDE_DIRS and FLEDGE_LIB_DIRS variables are set
 
 # Add ./include
 include_directories(include)
@@ -103,7 +103,7 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES} version.h)
 target_link_libraries(${PROJECT_NAME} ${NEEDED_FLEDGE_LIBS})
 # Add additional libraries
 
-# Set the build version 
+# Set the build version
 set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION 1)
 
 set(FLEDGE_INSTALL "" CACHE INTERNAL "")

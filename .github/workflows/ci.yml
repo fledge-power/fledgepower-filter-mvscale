@@ -50,15 +50,16 @@ jobs:
           echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
       - name: Download and install Fledge
         env:
-          FLEDGE_REPO_URL: "https://github.com/fledge-iot/fledge/archive/refs/tags/v2.5.0.zip"
+          FLEDGE_REPO_URL: "https://github.com/fledge-iot/fledge/archive/refs/heads/develop.zip"
         run: |
           curl -sSLo fledge-pkg.zip ${{ env.FLEDGE_REPO_URL }}
           unzip -o fledge-pkg.zip -d $HOME
-          mv $HOME/fledge-2.5.0 $HOME/fledge
+          mv $HOME/fledge-develop $HOME/fledge
           cd $HOME/fledge
           sudo apt-get update
           sudo apt-get install libcurl4-openssl-dev
-          sudo sed -i 's/cmake_minimum_required (VERSION 2.8.8)/cmake_minimum_required (VERSION 3.5)/g' $HOME/fledge/CMakeLists.txt
+          echo "/!\ PATCH Fledge CMAKELIST min version for compat cmake v4 /!\"
+          sudo sed -i 's/cmake_minimum_required (VERSION .*)/cmake_minimum_required (VERSION 3.10)/g' $HOME/fledge/CMakeLists.txt
           sudo $HOME/fledge/requirements.sh
           sudo make install
           sudo mkdir -p /usr/include/fledge/rapidjson/
