@@ -50,11 +50,11 @@ jobs:
           echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
       - name: Download and install Fledge
         env:
-          FLEDGE_REPO_URL: "https://github.com/fledge-iot/fledge/archive/refs/heads/develop.zip"
+          FLEDGE_REPO_URL: "https://github.com/fledge-iot/fledge/archive/refs/tags/v2.5.0.zip"
         run: |
           curl -sSLo fledge-pkg.zip ${{ env.FLEDGE_REPO_URL }}
           unzip -o fledge-pkg.zip -d $HOME
-          mv $HOME/fledge-develop $HOME/fledge
+          mv $HOME/fledge-2.5.0 $HOME/fledge
           cd $HOME/fledge
           sudo apt-get update
           sudo apt-get install libcurl4-openssl-dev
