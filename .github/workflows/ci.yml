@@ -59,8 +59,8 @@ jobs:
           cd $HOME/fledge
           sudo apt-get update
           sudo apt-get install libcurl4-openssl-dev
-          echo '/!\ PATCH Fledge CMAKELIST min version for compat cmake v4 /!\'
-          find $HOME/fledge/ -name 'CMakeLists.txt' -exec sed -i "s/cmake_minimum_required *( *VERSION [0-9]\+\.[0-9]\+\(\.[0-9]\+\)\? *)/cmake_minimum_required (VERSION ${{ env.CMAKE_MIN_VERSION }})/g" '{}' +
+          #echo '/!\ PATCH Fledge CMAKELIST min version for compat cmake v4 /!\'
+          #find $HOME/fledge/ -name 'CMakeLists.txt' -exec sed -i "s/cmake_minimum_required *( *VERSION [0-9]\+\.[0-9]\+\(\.[0-9]\+\)\? *)/cmake_minimum_required (VERSION ${{ env.CMAKE_MIN_VERSION }})/g" '{}' +
           sudo $HOME/fledge/requirements.sh
           sudo make install
           sudo mkdir -p /usr/include/fledge/rapidjson/
