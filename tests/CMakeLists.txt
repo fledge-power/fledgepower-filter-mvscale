@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 
 project(RunTests)
 
@@ -63,7 +63,7 @@ if (NOT FLEDGE_FOUND)
 	# Stop the build process
 	message(FATAL_ERROR "Fledge plugin '${PROJECT_NAME}' build error.")
 endif()
-# On success, FLEDGE_INCLUDE_DIRS and FLEDGE_LIB_DIRS variables are set 
+# On success, FLEDGE_INCLUDE_DIRS and FLEDGE_LIB_DIRS variables are set
 
 # Locate GTest
 find_package(GTest REQUIRED)
