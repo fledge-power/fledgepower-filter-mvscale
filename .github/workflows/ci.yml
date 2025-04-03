@@ -18,6 +18,7 @@ jobs:
                                         # https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/
       SONAR_SERVER_URL: "https://sonarcloud.io"
       BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
+      CMAKE_MIN_VERSION: "3.5"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -51,7 +52,6 @@ jobs:
       - name: Download and install Fledge
         env:
           FLEDGE_REPO_URL: "https://github.com/fledge-iot/fledge/archive/refs/heads/develop.zip"
-          CMAKE_MIN_VERSION: "3.5"
         run: |
           curl -sSLo fledge-pkg.zip ${{ env.FLEDGE_REPO_URL }}
           unzip -o fledge-pkg.zip -d $HOME
@@ -73,27 +73,21 @@ jobs:
           sudo mkdir -p /usr/lib/fledge/
           sudo cp -prv /usr/local/fledge/lib/* /usr/lib/fledge/
       - name: Download and install Google Unit Test framework
-        env:
-          CMAKE_MIN_VERSION: "3.5"
         run: |
           sudo apt-get install libgtest-dev
           cd /usr/src/gtest
-          find . -name 'CMakeLists.txt' -exec sed -i "s/cmake_minimum_required *( *VERSION [0-9]\+\.[0-9]\+\(\.[0-9]\+\)\? *)/cmake_minimum_required (VERSION ${{ env.CMAKE_MIN_VERSION }})/g" '{}' +
-          sudo cmake CMakeLists.txt
+          sudo cmake CMakeLists.txt -DCMAKE_POLICY_VERSION_MINIMUM=${{ env.CMAKE_MIN_VERSION }}
           sudo make
           sudo apt-get install libgmock-dev
       - name: Download and install gcovr
         run: |
           sudo apt-get install gcovr
       - name: Run build-wrapper
-        env:
-          CMAKE_MIN_VERSION: "3.5"
         run: |
           chmod +x mkversion
           export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib
           mkdir build
-          find . -name 'CMakeLists.txt' -exec sed -i "s/cmake_minimum_required *( *VERSION [0-9]\+\.[0-9]\+\(\.[0-9]\+\)\? *)/cmake_minimum_required (VERSION ${{ env.CMAKE_MIN_VERSION }})/g" '{}' +
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=Coverage
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Coverage -DCMAKE_POLICY_VERSION_MINIMUM=${{ env.CMAKE_MIN_VERSION }}
           build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build build/ --config Release
           cd build
           make
