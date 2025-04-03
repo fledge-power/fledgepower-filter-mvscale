@@ -18,7 +18,7 @@ jobs:
                                         # https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/
       SONAR_SERVER_URL: "https://sonarcloud.io"
       BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
-      CMAKE_MIN_VERSION: "3.5"
+      CMAKE_MIN_VERSION: "3.10"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -97,4 +97,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          sonar-scanner --define sonar.host.url="${{ env.SONAR_SERVER_URL }}" --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}" --define sonar.organization="fledge-power" --define sonar.projectKey="fledge-power_fledgepower-filter-mvscale" --define sonar.inclusions="src/*,include/*" --define sonar.coverageReportPaths="build/mvscale_coverage_sonar-sonarqube.xml"
+          sonar-scanner -X --define sonar.host.url="${{ env.SONAR_SERVER_URL }}" \
+            --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"\
+            --define sonar.organization="fledge-power" \
+            --define sonar.projectKey="fledge-power_fledgepower-filter-mvscale" \
+            --define sonar.inclusions="src/*,include/*" \
+            --define sonar.coverageReportPaths="build/mvscale_coverage_sonar-sonarqube.xml"
